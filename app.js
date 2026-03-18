@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-let mongoose = require('mongoose')
+// let mongoose = require('mongoose') removed
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -29,16 +29,32 @@ app.use('/api/v1/categories', require('./routes/categories'))
 app.use('/api/v1/auth', require('./routes/auth'))
 
 
-mongoose.connect('mongodb://localhost:27017/NNPTUD-C4');
-mongoose.connection.on('connected', function () {
-  console.log("connected");
-})
-mongoose.connection.on('disconnected', function () {
-  console.log("disconnected");
-})
-mongoose.connection.on('disconnecting', function () {
-  console.log("disconnecting");
-})
+const createDatabase = require('./utils/db_create_db');
+const sequelize = require('./utils/db');
+const Role = require('./models/Role');
+
+createDatabase()
+  .then(() => {
+    return sequelize.authenticate();
+  })
+  .then(() => {
+    console.log("SQL Server connected");
+    // Automatically sync models
+    return sequelize.sync({ force: false, alter: true });
+  })
+  .then(async () => {
+    console.log("Database synchronized & Tables created");
+    // Seed Default Roles if empty
+    const count = await Role.count();
+    if (count === 0) {
+        await Role.create({ name: 'Admin', description: 'Administrator' }); // gets ID 1
+        await Role.create({ name: 'User', description: 'Regular User' });   // gets ID 2
+        console.log("Default Roles (Admin, User) Seeded");
+    }
+  })
+  .catch(err => {
+    console.error("Database connection error:", err);
+  });
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
