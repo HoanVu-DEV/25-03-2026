@@ -36,6 +36,8 @@ const Inventory = sequelize.define('Inventory', {
     timestamps: true
 });
 
+
+
 // Associations
 Inventory.belongsTo(Product, { foreignKey: { name: 'ProductId', allowNull: false, unique: true }, as: 'product' });
 Product.hasOne(Inventory, { foreignKey: 'ProductId', as: 'inventory' });
