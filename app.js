@@ -26,12 +26,12 @@ app.use('/api/v1/users', require('./routes/users'));
 app.use('/api/v1/roles', require('./routes/roles'));
 app.use('/api/v1/products', require('./routes/products'))
 app.use('/api/v1/categories', require('./routes/categories'))
-app.use('/api/v1/auth', require('./routes/auth'))
-
+app.use('/api/v1/inventories', require('./routes/inventory'));
 
 const createDatabase = require('./utils/db_create_db');
 const sequelize = require('./utils/db');
 const Role = require('./models/Role');
+const Inventory = require('./models/Inventory');
 
 createDatabase()
   .then(() => {

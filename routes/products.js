@@ -47,6 +47,8 @@ router.get('/:id', async function (req, res, next) {
     }
 });
 
+const Inventory = require('../models/Inventory');
+
 router.post('/', async function (req, res, next) {
     try {
         let newProduct = await Product.create({
@@ -57,6 +59,15 @@ router.post('/', async function (req, res, next) {
             images: req.body.images || ["https://i.imgur.com/R3iobJA.jpeg"],
             CategoryId: req.body.category
         });
+
+        // Auto-create Inventory
+        await Inventory.create({
+            ProductId: newProduct.id,
+            stock: 0,
+            reserved: 0,
+            soldCount: 0
+        });
+
         res.send(newProduct);
     } catch (error) {
         res.status(400).send({ message: error.message });
